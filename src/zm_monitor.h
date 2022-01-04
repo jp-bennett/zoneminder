@@ -34,6 +34,9 @@
 #include <memory>
 #include <sys/time.h>
 #include <vector>
+#include "soapPullPointSubscriptionBindingProxy.h"
+#include "plugin/wsseapi.h"
+#include <openssl/err.h>
 
 #ifdef WITH_GSOAP
 #include "soapPullPointSubscriptionBindingProxy.h"

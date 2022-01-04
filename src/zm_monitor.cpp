@@ -1845,6 +1845,17 @@ bool Monitor::Analyse() {
 
     std::string cause;
     Event::StringSetMap noteSetMap;
+    // Specifically told to be on.  Setting the score here will trigger the alarm.
+    if (ONVIF_Trigger_State) {
+      score += 9;
+      Debug(1, "Triggered on ONVIF");
+      if (!event) {
+        cause += "ONVIF";
+      }
+      Event::StringSet noteSet;
+      noteSet.insert("ONVIF2");
+      noteSetMap[MOTION_CAUSE] = noteSet;
+    }  // end if trigger_on
 
 #ifdef WITH_GSOAP
     if (ONVIF_Trigger_State) {
