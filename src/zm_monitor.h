@@ -288,6 +288,7 @@ protected:
   std::string onvif_username;
   std::string onvif_password;
   std::string onvif_options;
+  bool        onvif_event_listener;
 
   std::string     device;
   int             palette;

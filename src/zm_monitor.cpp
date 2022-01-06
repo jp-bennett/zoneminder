@@ -88,7 +88,7 @@ std::string load_monitor_sql =
 "`SectionLength`, `MinSectionLength`, `FrameSkip`, `MotionFrameSkip`, "
 "`FPSReportInterval`, `RefBlendPerc`, `AlarmRefBlendPerc`, `TrackMotion`, `Exif`,"
 "`RTSPServer`, `RTSPStreamName`,"
-"`ONVIF_URL`, `ONVIF_Username`, `ONVIF_Password`, `ONVIF_Options`,"
+"`ONVIF_URL`, `ONVIF_Username`, `ONVIF_Password`, `ONVIF_Options`, `ONVIF_Event_Listener`"
 "`SignalCheckPoints`, `SignalCheckColour`, `Importance`-1 FROM `Monitors`";
 
 std::string CameraType_Strings[] = {
@@ -451,7 +451,7 @@ Monitor::Monitor()
  "SectionLength, MinSectionLength, FrameSkip, MotionFrameSkip, "
  "FPSReportInterval, RefBlendPerc, AlarmRefBlendPerc, TrackMotion, Exif,"
  "`RTSPServer`,`RTSPStreamName`,
- "`ONVIF_URL`, `ONVIF_Username`, `ONVIF_Password`, `ONVIF_Options`,"
+ "`ONVIF_URL`, `ONVIF_Username`, `ONVIF_Password`, `ONVIF_Options`, `ONVIF_Event_Listener`, "
  "SignalCheckPoints, SignalCheckColour, Importance-1 FROM Monitors";
 */
 
@@ -626,6 +626,7 @@ void Monitor::Load(MYSQL_ROW dbrow, bool load_zones=true, Purpose p = QUERY) {
   onvif_username = std::string(dbrow[col] ? dbrow[col] : ""); col++;
   onvif_password = std::string(dbrow[col] ? dbrow[col] : ""); col++;
   onvif_options = std::string(dbrow[col] ? dbrow[col] : ""); col++;
+  onvif_event_listener = (*dbrow[col] != '0'); col++;
 
   importance = dbrow[col] ? atoi(dbrow[col]) : 0;// col++;
 
@@ -1065,9 +1066,9 @@ bool Monitor::connect() {
   }
 
   //ONVIF Setup
-  Debug(1, "Starting ONVIF");
   ONVIF_Trigger_State = FALSE;
-  if (onvif_options.find("motion") != std::string::npos) { //Temporarily using this option to enable the feature
+  if (onvif_event_listener) { //Temporarily using this option to enable the feature
+    Debug(1, "Starting ONVIF");
     ONVIF_Healthy = FALSE;
     tev__PullMessages.Timeout = "PT600S";
     tev__PullMessages.MessageLimit = 100;
@@ -1093,6 +1094,8 @@ bool Monitor::connect() {
         ONVIF_Healthy = TRUE;
       }
     }
+  } else {
+    Debug(1, "Not Starting ONVIF");
   }
   //End ONVIF Setup
 
